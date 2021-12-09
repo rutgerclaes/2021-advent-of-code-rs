@@ -13,16 +13,16 @@ pub fn parse_day(main_file: &str) -> &str {
 }
 
 pub fn file_name_from_args() -> String {
-    env::args().nth(1).unwrap_or("puzzle".to_owned())
+    env::args().nth(1).unwrap_or_else(|| "puzzle".to_owned())
 }
 
-pub fn path_for_day<'a>(day: &str, file_name: &str) -> Result<Box<Path>> {
+pub fn path_for_day(day: &str, file_name: &str) -> Result<Box<Path>> {
     let path = fs::canonicalize(Path::new(&format!("{}/input/{}.input", day, file_name)))?;
     Ok(path.into_boxed_path())
 }
 
 pub fn read_string_from_file(path: &Path) -> Result<String> {
-    fs::read_to_string(path).map_err(|err| AOCError::from(err))
+    fs::read_to_string(path).map_err(AOCError::from)
 }
 
 pub fn read_lines_from_file<C: FromIterator<String>>(path: &Path) -> Result<C> {

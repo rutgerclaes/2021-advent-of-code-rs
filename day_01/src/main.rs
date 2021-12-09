@@ -19,17 +19,13 @@ fn main() {
     );
 }
 
-fn part_one(depths: &Vec<i32>) -> Result<usize> {
-    Ok(depths
-        .into_iter()
-        .tuple_windows()
-        .filter(|(a, b)| a < b)
-        .count())
+fn part_one(depths: &[i32]) -> Result<usize> {
+    Ok(depths.iter().tuple_windows().filter(|(a, b)| a < b).count())
 }
 
-fn part_two(depths: &Vec<i32>) -> Result<usize> {
+fn part_two(depths: &[i32]) -> Result<usize> {
     Ok(depths
-        .into_iter()
+        .iter()
         .tuple_windows()
         .map(|(a, b, c)| a + b + c)
         .tuple_windows()

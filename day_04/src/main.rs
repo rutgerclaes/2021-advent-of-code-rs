@@ -33,10 +33,10 @@ fn main() {
     );
 }
 
-fn part_one(numbers: &Vec<u8>, boards: &Vec<Board>) -> Result<u64> {
+fn part_one(numbers: &[u8], boards: &[Board]) -> Result<u64> {
     let result = numbers
         .iter()
-        .fold_while(Left(boards.clone()), |boards, number| {
+        .fold_while(Left(Vec::from( boards )), |boards, number| {
             let updated_boars: Vec<Board> = boards
                 .unwrap_left()
                 .iter()
@@ -55,11 +55,11 @@ fn part_one(numbers: &Vec<u8>, boards: &Vec<Board>) -> Result<u64> {
     }
 }
 
-fn part_two(numbers: &Vec<u8>, boards: &Vec<Board>) -> Result<u64> {
+fn part_two(numbers: &[u8], boards: &[Board]) -> Result<u64> {
     let result: FoldWhile<Either<Vec<Board>, (Board, u8)>> =
         numbers
             .iter()
-            .fold_while(Left(boards.clone()), |boards, number| match boards {
+            .fold_while(Left(Vec::from(boards)), |boards, number| match boards {
                 Left(multiple_boards) => {
                     let updated_boards: Vec<Board> = multiple_boards
                         .iter()
@@ -77,7 +77,7 @@ fn part_two(numbers: &Vec<u8>, boards: &Vec<Board>) -> Result<u64> {
                         for board in &updated_boards {
                             debug!("\n{}", board);
                         }
-                        Continue(Left(updated_boards.clone()))
+                        Continue(Left(updated_boards))
                     }
                 }
                 Right((board, _)) => {
@@ -138,7 +138,7 @@ struct Board {
 }
 
 impl Board {
-    fn new(numbers: &Vec<std::vec::Vec<u8>>) -> Board {
+    fn new(numbers: &[Vec<u8>]) -> Board {
         let numbers_map: HashMap<Position, u8> = numbers
             .iter()
             .enumerate()
@@ -151,10 +151,10 @@ impl Board {
         let positions = numbers_map.iter().map(|(k, v)| (*v, k.clone())).collect();
         let hits: HashSet<Position> = HashSet::new();
         Board {
-            hits: hits,
+            hits,
             width: 5,
             height: 5,
-            positions: positions,
+            positions,
             numbers: numbers_map,
         }
     }
@@ -216,10 +216,10 @@ impl Display for Board {
     }
 }
 
-fn parse_input<'a>(input: Vec<String>) -> (Vec<u8>, Vec<Board>) {
+fn parse_input(input: Vec<String>) -> (Vec<u8>, Vec<Board>) {
     let mut iterator = input.iter();
     let numbers = iterator
-        .nth(0)
+        .next()
         .unwrap()
         .split(',')
         .map(|string| string.parse::<u8>().unwrap())

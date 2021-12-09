@@ -56,7 +56,7 @@ fn part_two(map: &HeightMap) -> Result<usize> {
         }
     }
 
-    let basins = map
+    let basins: Vec<_> = map
         .minima()
         .map(|(pos, _)| calculate_basin(map, hashset![pos], HashSet::new()))
         .collect();
@@ -65,13 +65,13 @@ fn part_two(map: &HeightMap) -> Result<usize> {
     let product = basins
         .iter()
         .map(|b| b.len())
-        .sorted_by_key(|&s| -1 * s as i64)
+        .sorted_by_key(|&s| -(s as i64))
         .take(3)
         .product();
     Ok(product)
 }
 
-fn colorize(map: &HeightMap, basins: &Vec<HashSet<(usize, usize)>>) {
+fn colorize(map: &HeightMap, basins: &[HashSet<(usize, usize)>]) {
     let colours = vec![
         Color::Blue,
         Color::Cyan,
@@ -107,7 +107,7 @@ fn colorize(map: &HeightMap, basins: &Vec<HashSet<(usize, usize)>>) {
 
             print!("{}", style.paint(format!("{}", v)));
         }
-        println!("")
+        println!()
     }
 }
 
@@ -119,7 +119,7 @@ struct HeightMap {
 }
 
 impl HeightMap {
-    fn new(input: &Vec<Vec<usize>>) -> HeightMap {
+    fn new(input: &[Vec<usize>]) -> HeightMap {
         let heights = input
             .iter()
             .enumerate()
@@ -208,12 +208,12 @@ impl FromStr for HeightMap {
                     .map(|c| {
                         c.to_digit(10)
                             .map(|i| i as usize)
-                            .ok_or(AOCError::new_from_ref("Invalid char"))
+                            .ok_or_else( || AOCError::new_from_ref("Invalid char"))
                     })
                     .try_collect();
                 line_heights
             })
             .try_collect()
-            .map(|heights| HeightMap::new(&heights))
+            .map(|heights: Vec<Vec<usize>>| HeightMap::new(&heights))
     }
 }

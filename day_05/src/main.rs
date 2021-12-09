@@ -20,7 +20,7 @@ fn main() {
     info!("Solution to part two: {}", display_result(part_two(&lines)));
 }
 
-fn part_one(lines: &Vec<Line>) -> Result<usize> {
+fn part_one(lines: &[Line]) -> Result<usize> {
     let map = lines
         .iter()
         .filter(|l| l.is_horizontal() || l.is_vertical())
@@ -28,7 +28,7 @@ fn part_one(lines: &Vec<Line>) -> Result<usize> {
     Ok(map.get_overlap_count())
 }
 
-fn part_two(lines: &Vec<Line>) -> Result<usize> {
+fn part_two(lines: &[Line]) -> Result<usize> {
     let map = lines
         .iter()
         .fold(Map::empty(), |map, line| map.update(line));
@@ -60,7 +60,7 @@ impl Map {
     }
 
     fn get_count(&self, point: &Point) -> usize {
-        self.point_count.get(point).map(|c| *c).unwrap_or(0)
+        self.point_count.get(point).copied().unwrap_or(0)
     }
 
     fn get_overlap_count(&self) -> usize {
@@ -90,14 +90,13 @@ impl Map {
                 counts.update_with(point, 1, |a, b| a + b)
             });
 
-        let result = Map {
+        Map {
             point_count: new_counts,
             min_x: new_min_x,
             min_y: new_min_y,
             max_x: new_max_x,
             max_y: new_max_y,
-        };
-        result
+        }
     }
 }
 
@@ -116,9 +115,9 @@ impl Display for Map {
                     }
                 )?;
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
-        write!(f, "")
+        Ok( () )
     }
 }
 
@@ -148,7 +147,7 @@ impl FromStr for Point {
             .split(',')
             .map(|s| s.parse::<usize>().unwrap())
             .collect_tuple()
-            .ok_or(AOCError::new(format!("Error parsing '{}'", input)))?;
+            .ok_or_else(|| AOCError::new(format!("Error parsing '{}'", input)))?;
         Ok(Point::new(x, y))
     }
 }
@@ -223,12 +222,12 @@ impl FromStr for Line {
     fn from_str(input: &str) -> std::result::Result<Self, <Self as std::str::FromStr>::Err> {
         let points: Vec<Point> = input
             .split(" -> ")
-            .map(|p| Point::from_str(p))
+            .map(Point::from_str)
             .try_collect()?;
         let (start, end) = points
             .into_iter()
             .collect_tuple()
-            .ok_or(AOCError::new(format!("Error parsing '{}'", input)))?;
+            .ok_or_else(|| AOCError::new(format!("Error parsing '{}'", input)))?;
         Ok(Line::new(start, end))
     }
 }

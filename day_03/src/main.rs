@@ -79,8 +79,8 @@ impl FromStr for BinaryNumber {
     }
 }
 
-fn part_one(numbers: &Vec<BinaryNumber>) -> Result<u32> {
-    let mut iterator = numbers.into_iter();
+fn part_one(numbers: &[BinaryNumber]) -> Result<u32> {
+    let mut iterator = numbers.iter();
 
     iterator
         .next()
@@ -104,18 +104,17 @@ fn part_one(numbers: &Vec<BinaryNumber>) -> Result<u32> {
 
             u32::from(&gamma) * u32::from(&epsilon)
         })
-        .ok_or(AOCError::new_from_ref("Empty list of numbers"))
+        .ok_or_else( || AOCError::new_from_ref("Empty list of numbers"))
 }
 
-fn part_two(numbers: &Vec<BinaryNumber>) -> Result<u32> {
-    let list: Vec<&BinaryNumber> = numbers.into_iter().collect();
-    let oxygen_generator_rating = filter_by_bit(list.clone(), 0, true)?;
+fn part_two(numbers: &[BinaryNumber]) -> Result<u32> {
+    let oxygen_generator_rating = filter_by_bit( numbers.iter().collect(), 0, true)?;
     debug!(
         "Oxygen generator rating: {} ({})",
         oxygen_generator_rating,
         u32::from(oxygen_generator_rating)
     );
-    let co2_scrubber_rating = filter_by_bit(list, 0, false)?;
+    let co2_scrubber_rating = filter_by_bit( numbers.iter().collect(), 0, false)?;
     debug!(
         "CO2 scrubber rating: {} ({})",
         co2_scrubber_rating,
@@ -125,11 +124,12 @@ fn part_two(numbers: &Vec<BinaryNumber>) -> Result<u32> {
     Ok(u32::from(oxygen_generator_rating) * u32::from(co2_scrubber_rating))
 }
 
-fn filter_by_bit<'a>(
-    list: Vec<&'a BinaryNumber>,
+#[allow(clippy::collapsible_else_if)]
+fn filter_by_bit(
+    list: Vec<&BinaryNumber>,
     index: usize,
     keep_largest: bool,
-) -> Result<&'a BinaryNumber> {
+) -> Result<&BinaryNumber> {
     if list.is_empty() {
         Err(AOCError::new_from_ref("No number found"))
     } else if list.len() == 1 {

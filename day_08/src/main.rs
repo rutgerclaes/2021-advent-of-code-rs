@@ -20,7 +20,7 @@ fn main() {
     info!("Solution to part two: {}", display_result(part_two(&notes)));
 }
 
-fn part_one(notes: &Vec<Note>) -> Result<usize> {
+fn part_one(notes: &[Note]) -> Result<usize> {
     let result = notes
         .iter()
         .flat_map(|note| note.output_patterns.iter())
@@ -33,7 +33,7 @@ fn part_one(notes: &Vec<Note>) -> Result<usize> {
     Ok(result)
 }
 
-fn part_two(notes: &Vec<Note>) -> Result<usize> {
+fn part_two(notes: &[Note]) -> Result<usize> {
     let outputs: Vec<usize> = notes.iter().map(|note| note.decode()).try_collect()?;
     Ok(outputs.iter().sum())
 }
@@ -225,7 +225,7 @@ impl Note {
                 .find_map(|(value, pattern)| {
                     Some(value).filter(|_| pattern.is_equivalent_to(input))
                 })
-                .ok_or(AOCError::new_from_ref(""))
+                .ok_or_else(||AOCError::new( format!("Output pattern {} not found", input ) ))
         };
 
         let digits: Vec<usize> = self.output_patterns.iter().map(decode).try_collect()?;
@@ -258,7 +258,7 @@ impl FromStr for Note {
         let (signal_string, output_string) = input
             .split(" | ")
             .collect_tuple()
-            .ok_or(AOCError::new_from_ref("Malformed input"))?;
+            .ok_or_else(||AOCError::new_from_ref("Malformed input"))?;
 
         let digits = signal_string
             .split_whitespace()

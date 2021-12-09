@@ -21,20 +21,20 @@ fn main() {
     );
 }
 
-fn part_one(instructions: &Vec<Instruction>) -> Result<i64> {
+fn part_one(instructions: &[Instruction]) -> Result<i64> {
     let result = instructions
-        .into_iter()
+        .iter()
         .fold(Position::zero(), |position, instruction| {
-            position.apply(&instruction)
+            position.apply(instruction)
         });
     Ok(result.horizontal as i64 * result.depth as i64)
 }
 
-fn part_two(instructions: &Vec<Instruction>) -> Result<i64> {
+fn part_two(instructions: &[Instruction]) -> Result<i64> {
     let result = instructions
-        .into_iter()
+        .iter()
         .fold(PositionAndAim::zero(), |position, instruction| {
-            position.apply(&instruction)
+            position.apply(instruction)
         });
     Ok(result.position.horizontal as i64 * result.position.depth as i64)
 }
@@ -54,13 +54,13 @@ impl Position {
         Position { horizontal, depth }
     }
 
-    fn apply(self, instruction: &Instruction) -> Position {
+    fn apply(&self, instruction: &Instruction) -> Position {
         match instruction.direction {
-            Direction::DOWN => {
+            Direction::Down => {
                 Position::new(self.horizontal, self.depth + instruction.steps as i32)
             }
-            Direction::UP => Position::new(self.horizontal, self.depth - instruction.steps as i32),
-            Direction::FORWARD => {
+            Direction::Up => Position::new(self.horizontal, self.depth - instruction.steps as i32),
+            Direction::Forward => {
                 Position::new(self.horizontal + instruction.steps as i32, self.depth)
             }
         }
@@ -94,13 +94,13 @@ impl PositionAndAim {
 
     fn apply(self, instruction: &Instruction) -> PositionAndAim {
         match instruction.direction {
-            Direction::DOWN => {
+            Direction::Down => {
                 PositionAndAim::new(self.aim + instruction.steps as i32, self.position)
             }
-            Direction::UP => {
+            Direction::Up => {
                 PositionAndAim::new(self.aim - instruction.steps as i32, self.position)
             }
-            Direction::FORWARD => PositionAndAim::new(
+            Direction::Forward => PositionAndAim::new(
                 self.aim,
                 Position::new(
                     self.position.horizontal + instruction.steps as i32,
@@ -116,6 +116,7 @@ impl Display for PositionAndAim {
         write!(f, "aim: {:+05} {}", self.aim, self.position)
     }
 }
+
 #[derive(Debug, Clone)]
 struct Instruction {
     direction: Direction,
@@ -130,9 +131,9 @@ impl Instruction {
 
 #[derive(Debug, Clone)]
 enum Direction {
-    DOWN,
-    UP,
-    FORWARD,
+    Down,
+    Up,
+    Forward,
 }
 
 impl Display for Instruction {
@@ -143,11 +144,12 @@ impl Display for Instruction {
 
 impl Display for Direction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        match self {
-            Direction::DOWN => write!(f, "down"),
-            Direction::UP => write!(f, "up"),
-            Direction::FORWARD => write!(f, "forward"),
-        }
+        let output = match self {
+            Direction::Down => "down",
+            Direction::Up => "up",
+            Direction::Forward => "forward",
+        };
+        write!(f, "{}", output)
     }
 }
 
@@ -156,9 +158,9 @@ impl FromStr for Direction {
 
     fn from_str(input: &str) -> std::result::Result<Self, <Self as std::str::FromStr>::Err> {
         match input {
-            "down" => Ok(Direction::DOWN),
-            "up" => Ok(Direction::UP),
-            "forward" => Ok(Direction::FORWARD),
+            "down" => Ok(Direction::Down),
+            "up" => Ok(Direction::Up),
+            "forward" => Ok(Direction::Forward),
             unrec => Err(AOCError::new(format!(
                 "Failed to parse '{}' as direction",
                 unrec

@@ -14,8 +14,8 @@ fn main() {
     let day = parse_day(file!());
     let file = file_name_from_args();
     let contents: String = read_string_from_file(&path_for_day(day, &file).unwrap()).unwrap();
-    let fish: Vector<u8> = contents
-        .split(",")
+    let fish: Vec<u8> = contents
+        .split(',')
         .map(|p| p.parse::<u8>())
         .try_collect()
         .unwrap();
@@ -24,11 +24,11 @@ fn main() {
     info!("Solution to part two: {}", display_result(part_two(&fish)));
 }
 
-fn part_one(fish: &Vector<u8>) -> Result<usize> {
-    Ok(simulate(fish.clone(), 80))
+fn part_one(fish: &[u8]) -> Result<usize> {
+    Ok(simulate(Vector::from( fish ), 80))
 }
 
-fn part_two(fish: &Vector<u8>) -> Result<usize> {
+fn part_two(fish: &[u8]) -> Result<usize> {
     let grouped = fish.iter().counts();
     let fish_counts: Vector<usize> = (0..9)
         .map(|i| grouped.get(&i).unwrap_or(&0))
