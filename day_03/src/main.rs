@@ -8,7 +8,7 @@ use utils::results::*;
 extern crate log;
 
 fn main() {
-    env_logger::builder().format_timestamp(None).init();
+    init_env_log();
 
     let day = parse_day(file!());
     let file = file_name_from_args();

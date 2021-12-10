@@ -5,17 +5,22 @@ use utils::input::*;
 use utils::output::*;
 use utils::results::*;
 
+#[macro_use]
+extern crate log;
+
 fn main() {
+    init_env_log();
+
     let day = parse_day(file!());
     let file = file_name_from_args();
     let instructions: Vec<Instruction> =
         parse_lines_from_file(&path_for_day(day, &file).unwrap()).unwrap();
 
-    println!(
+    info!(
         "Solution to part one: {}",
         display_result(part_one(&instructions))
     );
-    println!(
+    info!(
         "Solution to part two: {}",
         display_result(part_two(&instructions))
     );
@@ -39,7 +44,7 @@ fn part_two(instructions: &[Instruction]) -> Result<i64> {
     Ok(result.position.horizontal as i64 * result.position.depth as i64)
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 struct Position {
     horizontal: i32,
     depth: i32,
@@ -77,7 +82,7 @@ impl Display for Position {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 struct PositionAndAim {
     aim: i32,
     position: Position,
@@ -92,7 +97,7 @@ impl PositionAndAim {
         PositionAndAim { aim, position }
     }
 
-    fn apply(self, instruction: &Instruction) -> PositionAndAim {
+    fn apply(&self, instruction: &Instruction) -> PositionAndAim {
         match instruction.direction {
             Direction::Down => {
                 PositionAndAim::new(self.aim + instruction.steps as i32, self.position)
@@ -117,7 +122,7 @@ impl Display for PositionAndAim {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 struct Instruction {
     direction: Direction,
     steps: u32,
@@ -129,7 +134,7 @@ impl Instruction {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 enum Direction {
     Down,
     Up,
@@ -180,5 +185,89 @@ impl FromStr for Instruction {
         } else {
             Err(AOCError::new(format!("Could not parse '{}'", input)))
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+
+    #[test]
+    fn position_can_be_created() {
+        let zero = Position::zero();
+        assert_eq!(zero, Position::new(0, 0));
+        assert_eq!(zero.horizontal, 0);
+        assert_eq!(zero.depth, 0);
+    }
+
+    #[test]
+    fn position_can_interpret_instruction() {
+        let zero = Position::zero();
+
+        let down = zero.apply(&Instruction::new(Direction::Down, 42));
+        assert_eq!(down.depth, 42);
+        assert_eq!(down.horizontal, 0);
+
+        let up = down.apply(&Instruction::new(Direction::Up, 20));
+        assert_eq!(up.depth, 22);
+        assert_eq!(up.horizontal, 0);
+
+        let forward = up.apply(&Instruction::new(Direction::Forward, 7));
+        assert_eq!(forward.depth, 22);
+        assert_eq!(forward.horizontal, 7);
+    }
+
+    #[test]
+    fn position_and_aim_can_be_created() {
+        let zero = PositionAndAim::zero();
+        assert_eq!(zero, PositionAndAim::new(0, Position::new(0, 0)));
+        assert_eq!(zero.aim, 0);
+        assert_eq!(zero.position, Position::zero());
+    }
+
+    #[test]
+    fn position_and_aim_can_interpret_instructions() {
+        let zero = PositionAndAim::zero();
+
+        let down = zero.apply(&Instruction::new(Direction::Down, 2));
+        assert_eq!(down.position, zero.position);
+        assert_eq!(down.aim, 2);
+
+        let forward_down = down.apply(&Instruction::new(Direction::Forward, 2));
+        assert_eq!(forward_down.position, Position::new(2, 4));
+        assert_eq!(forward_down.aim, 2);
+
+        let level = forward_down.apply(&Instruction::new(Direction::Up, 2));
+        assert_eq!(level.position, forward_down.position);
+        assert_eq!(level.aim, 0);
+
+        let forward_level = level.apply(&Instruction::new(Direction::Forward, 3));
+        assert_eq!(forward_level.position, Position::new(5, 4));
+        assert_eq!(forward_level.aim, 0);
+
+        let up = forward_level.apply(&Instruction::new(Direction::Up, 1));
+        assert_eq!(up.position, forward_level.position);
+        assert_eq!(up.aim, -1);
+
+        let forward_up = up.apply(&Instruction::new(Direction::Forward, 4));
+        assert_eq!(forward_up.position, Position::new(9, 0));
+        assert_eq!(forward_up.aim, -1);
+    }
+
+    #[test]
+    fn parse_instruction() {
+        assert_eq!(
+            "forward 5".parse::<Instruction>(),
+            Ok(Instruction::new(Direction::Forward, 5))
+        );
+        assert_eq!(
+            "down 2".parse::<Instruction>(),
+            Ok(Instruction::new(Direction::Down, 2))
+        );
+        assert_eq!(
+            "up 3".parse::<Instruction>(),
+            Ok(Instruction::new(Direction::Up, 3))
+        );
     }
 }
