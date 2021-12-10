@@ -34,13 +34,13 @@ fn part_one(positions: &[u32]) -> Result<u64> {
         .iter()
         .minmax()
         .into_option()
-        .ok_or_else(||AOCError::new_from_ref("Empty list of positions"))?;
+        .ok_or_else(|| AOCError::new_from_ref("Empty list of positions"))?;
     let minmax = (*min..max + 1).map(|pos| fuel_for(positions, pos)).minmax();
 
     minmax
         .into_option()
         .map(|(min, _)| min)
-        .ok_or_else(||AOCError::new_from_ref("Empty list of positions"))
+        .ok_or_else(|| AOCError::new_from_ref("Empty list of positions"))
 }
 
 fn fuel_for(positions: &[u32], position: u32) -> u64 {

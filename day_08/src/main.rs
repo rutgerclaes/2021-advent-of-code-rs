@@ -156,10 +156,13 @@ impl Note {
             })
     }
 
-    fn find_patterns_with_len(&self, length: usize) -> HashSet<&SignalPattern> {
+    fn find_patterns_with_len<'a, I>(&'a self, length: usize) -> I
+    where
+        I: FromIterator<&'a SignalPattern>,
+    {
         self.digit_patterns
             .iter()
-            .filter(|d| d.signals.len() == length)
+            .filter(move |d| d.signals.len() == length)
             .collect()
     }
 
@@ -225,7 +228,7 @@ impl Note {
                 .find_map(|(value, pattern)| {
                     Some(value).filter(|_| pattern.is_equivalent_to(input))
                 })
-                .ok_or_else(||AOCError::new( format!("Output pattern {} not found", input ) ))
+                .ok_or_else(|| AOCError::new(format!("Output pattern {} not found", input)))
         };
 
         let digits: Vec<usize> = self.output_patterns.iter().map(decode).try_collect()?;
@@ -258,7 +261,7 @@ impl FromStr for Note {
         let (signal_string, output_string) = input
             .split(" | ")
             .collect_tuple()
-            .ok_or_else(||AOCError::new_from_ref("Malformed input"))?;
+            .ok_or_else(|| AOCError::new_from_ref("Malformed input"))?;
 
         let digits = signal_string
             .split_whitespace()

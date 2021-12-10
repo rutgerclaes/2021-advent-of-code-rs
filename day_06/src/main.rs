@@ -25,7 +25,7 @@ fn main() {
 }
 
 fn part_one(fish: &[u8]) -> Result<usize> {
-    Ok(simulate(Vector::from( fish ), 80))
+    Ok(simulate(Vector::from(fish), 80))
 }
 
 fn part_two(fish: &[u8]) -> Result<usize> {

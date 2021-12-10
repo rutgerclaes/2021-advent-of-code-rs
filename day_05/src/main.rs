@@ -117,7 +117,7 @@ impl Display for Map {
             }
             writeln!(f)?;
         }
-        Ok( () )
+        Ok(())
     }
 }
 
@@ -220,10 +220,7 @@ impl FromStr for Line {
     type Err = AOCError;
 
     fn from_str(input: &str) -> std::result::Result<Self, <Self as std::str::FromStr>::Err> {
-        let points: Vec<Point> = input
-            .split(" -> ")
-            .map(Point::from_str)
-            .try_collect()?;
+        let points: Vec<Point> = input.split(" -> ").map(Point::from_str).try_collect()?;
         let (start, end) = points
             .into_iter()
             .collect_tuple()

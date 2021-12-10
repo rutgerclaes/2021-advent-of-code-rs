@@ -37,11 +37,8 @@ impl BinaryNumber {
         self.0[index]
     }
 
-    fn counts(&self) -> Vec<(usize, usize)> {
-        self.0
-            .iter()
-            .map(|&b| if b { (1, 0) } else { (0, 1) })
-            .collect()
+    fn counts(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        self.0.iter().map(|&b| if b { (1, 0) } else { (0, 1) })
     }
 
     fn len(&self) -> usize {
@@ -85,7 +82,7 @@ fn part_one(numbers: &[BinaryNumber]) -> Result<u32> {
     iterator
         .next()
         .map(|head| {
-            let counts = iterator.fold(head.counts(), {
+            let counts: Vec<(usize, usize)> = iterator.fold(head.counts().collect(), {
                 |counts, number| {
                     counts
                         .iter()
@@ -104,17 +101,17 @@ fn part_one(numbers: &[BinaryNumber]) -> Result<u32> {
 
             u32::from(&gamma) * u32::from(&epsilon)
         })
-        .ok_or_else( || AOCError::new_from_ref("Empty list of numbers"))
+        .ok_or_else(|| AOCError::new_from_ref("Empty list of numbers"))
 }
 
 fn part_two(numbers: &[BinaryNumber]) -> Result<u32> {
-    let oxygen_generator_rating = filter_by_bit( numbers.iter().collect(), 0, true)?;
+    let oxygen_generator_rating = filter_by_bit(numbers.iter().collect(), 0, true)?;
     debug!(
         "Oxygen generator rating: {} ({})",
         oxygen_generator_rating,
         u32::from(oxygen_generator_rating)
     );
-    let co2_scrubber_rating = filter_by_bit( numbers.iter().collect(), 0, false)?;
+    let co2_scrubber_rating = filter_by_bit(numbers.iter().collect(), 0, false)?;
     debug!(
         "CO2 scrubber rating: {} ({})",
         co2_scrubber_rating,

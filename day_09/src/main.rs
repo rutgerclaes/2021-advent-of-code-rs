@@ -208,7 +208,7 @@ impl FromStr for HeightMap {
                     .map(|c| {
                         c.to_digit(10)
                             .map(|i| i as usize)
-                            .ok_or_else( || AOCError::new_from_ref("Invalid char"))
+                            .ok_or_else(|| AOCError::new_from_ref("Invalid char"))
                     })
                     .try_collect();
                 line_heights

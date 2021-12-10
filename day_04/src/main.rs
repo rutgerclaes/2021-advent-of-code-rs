@@ -36,7 +36,7 @@ fn main() {
 fn part_one(numbers: &[u8], boards: &[Board]) -> Result<u64> {
     let result = numbers
         .iter()
-        .fold_while(Left(Vec::from( boards )), |boards, number| {
+        .fold_while(Left(Vec::from(boards)), |boards, number| {
             let updated_boars: Vec<Board> = boards
                 .unwrap_left()
                 .iter()
