@@ -6,7 +6,7 @@ use std::fmt::Display;
 
 pub type Result<T> = std::result::Result<T, AOCError>;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct AOCError(String);
 
 impl AOCError {

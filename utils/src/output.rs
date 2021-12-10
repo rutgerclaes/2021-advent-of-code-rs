@@ -2,9 +2,9 @@ use crate::results::Result;
 use ansi_term::Colour::Green;
 use ansi_term::Colour::Red;
 use ansi_term::Style;
+use env_logger::Builder;
+use env_logger::Env;
 use std::fmt::Display;
-
-// mod output {
 
 pub fn display_result<I: Display>(result: Result<I>) -> String {
     let style = Style::new().bold();
@@ -19,4 +19,8 @@ pub fn display_result<I: Display>(result: Result<I>) -> String {
             .to_string(),
     }
 }
-// }
+
+pub fn init_env_log() {
+    let env = Env::default().default_filter_or("info");
+    Builder::from_env(env).format_timestamp(None).init();
+}
